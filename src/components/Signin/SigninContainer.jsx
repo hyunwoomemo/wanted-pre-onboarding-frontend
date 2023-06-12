@@ -12,7 +12,7 @@ const SigninContainer = () => {
         <Signin.PasswordInput />
         <ButtonWrapper>
           <Signin.BackBtn>Back</Signin.BackBtn>
-          <Signin.SubmitBtn>Sign up</Signin.SubmitBtn>
+          <Signin.SubmitBtn>Sign in</Signin.SubmitBtn>
         </ButtonWrapper>
       </Container>
     </Signin>
