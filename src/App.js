@@ -7,7 +7,16 @@ import { useEffect } from 'react';
 import Todo from './pages/Todo';
 
 function App() {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
 
+    // 로컬 스토리지에 토큰이 있는지 확인하여 리다이렉트 처리
+    if (token && (window.location.pathname === '/signin' || window.location.pathname === '/signup')) {
+      window.location.href = '/todo';
+    } else if (!token && window.location.pathname === '/todo') {
+      window.location.href = '/signin';
+    }
+  })
 
   return (
     <>
