@@ -171,8 +171,8 @@ const TodoItem = ({ children, completed, id, order, editMode }) => {
             </Button>
           </div>
         ) : (
-          <>
-            <label>
+          <div style={{ display: "flex", alignContent: "center" }}>
+            <label style={{ flex: "1 1 auto", display: "flex", gap: "10px" }}>
               <input type="checkbox" checked={completed} onChange={(e) => handleCheckboxChange(id, e.target.checked)} />
               <input data-testid="modify-input" defaultValue={children} onChange={handleEditChange} />
             </label>
@@ -182,7 +182,7 @@ const TodoItem = ({ children, completed, id, order, editMode }) => {
             <Button size="small" data="cancel-Button" event={() => setEdit(false)}>
               취소
             </Button>
-          </>
+          </div>
         )}
       </li>
     </ItemWrapper>

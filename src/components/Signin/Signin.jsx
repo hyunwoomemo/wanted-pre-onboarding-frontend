@@ -32,12 +32,12 @@ const SigninHeading = ({ children }) => {
 
 const SigninEmailInput = () => {
   const { email, setEmail } = useContext(SigninContext);
-  return <Input type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>;
+  return <Input data="email-input" type="email" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)}></Input>;
 };
 
 const SigninPasswordInput = () => {
   const { password, setPassword } = useContext(SigninContext);
-  return <Input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}></Input>;
+  return <Input data="password-input" type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)}></Input>;
 };
 
 const SigninBackButton = ({ children }) => {
@@ -71,7 +71,7 @@ const SigninSubmitButton = ({ children }) => {
     }
   };
   return (
-    <Button event={handleSubmit} disabled={disabled()}>
+    <Button data="signin-button" event={handleSubmit} disabled={disabled()}>
       {children}
     </Button>
   );
