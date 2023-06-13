@@ -49,7 +49,7 @@ const SigninBackButton = ({ children }) => {
 };
 
 const SigninSubmitButton = ({ children }) => {
-  const url = "http://localhost:3030";
+  const url = "https://www.pre-onboarding-selection-task.shop";
   const navigate = useNavigate();
   const { email, password } = useContext(SigninContext);
   const disabled = () => {
@@ -60,9 +60,9 @@ const SigninSubmitButton = ({ children }) => {
       const response = await axios.post(`${url}/auth/signin`, { email, password });
 
       if (response.status === 200) {
-        const { token } = response.data;
+        const { access_token } = response.data;
         // JWT를 로컬 스토리지에 저장
-        localStorage.setItem("token", token);
+        localStorage.setItem("token", access_token);
         // 로그인 성공 시 /todo 경로로 이동
         navigate("/todo");
       }

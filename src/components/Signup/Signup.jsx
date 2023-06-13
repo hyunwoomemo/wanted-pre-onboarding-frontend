@@ -49,7 +49,7 @@ const SignupBackButton = ({ children }) => {
 };
 
 const SignupSubmitButton = ({ children }) => {
-  const url = "http://localhost:3030";
+  const url = "https://www.pre-onboarding-selection-task.shop";
   const { email, password } = useContext(SignupContext);
   const disabled = () => {
     return email.indexOf("@") > -1 && password.length > 7 ? false : true;

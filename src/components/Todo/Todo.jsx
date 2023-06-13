@@ -37,24 +37,35 @@ const TodoHeading = ({ children }) => {
 };
 
 const CreateTodo = () => {
-  const url = "http://localhost:3030";
+  const url = "https://www.pre-onboarding-selection-task.shop";
   const { todoValue, setTodoValue, todos, setTodos } = useContext(TodoContext);
+  const access_token = localStorage.getItem("token");
 
-  const handleAddTodo = async (length) => {
+  const handleAddTodo = async () => {
     try {
-      const response = await axios.post(`${url}/todos`, { todoValue, length });
-      const todos = response.data;
-      setTodos(todos);
+      const response = await axios.post(
+        `${url}/todos`,
+        {
+          todo: todoValue,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const todosData = response.data;
+      setTodos((prev) => [...prev, todosData]);
       setTodoValue("");
     } catch (error) {
       console.error(error);
     }
   };
-
   return (
     <Wrapper>
       <Input type="text" value={todoValue} onChange={(e) => setTodoValue(e.target.value)} data="new-todo-input" placeholder="할 일을 입력하세요"></Input>
-      <Button data="new-todo-add-button" event={() => handleAddTodo(todos.length)}>
+      <Button data="new-todo-add-button" event={handleAddTodo}>
         추가
       </Button>
     </Wrapper>
@@ -68,12 +79,18 @@ const Wrapper = styled.div`
 
 const TodoList = () => {
   const { todos, setTodos, edit } = useContext(TodoContext);
-  const url = "http://localhost:3030";
+  const url = "https://www.pre-onboarding-selection-task.shop";
+  const access_token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchTodos = async () => {
       try {
-        const response = await axios.get(`${url}/todos`);
+        const response = await axios.get(`${url}/todos`, {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        });
         setTodos(response.data);
       } catch (error) {
         console.error(error);
@@ -85,10 +102,10 @@ const TodoList = () => {
 
   return (
     <ul>
-      {todos.map((todo, i) => {
+      {todos.map((v, i) => {
         return (
-          <TodoItem order={i} id={todo.id} key={todo.id} editMode={i === edit} completed={todo.isCompleted}>
-            {todo.todo}
+          <TodoItem id={v.id} key={v.id} editMode={v.id === edit} completed={v.isCompleted}>
+            {v.todo}
           </TodoItem>
         );
       })}
@@ -96,17 +113,30 @@ const TodoList = () => {
   );
 };
 
-const TodoItem = ({ children, completed, id, order, editMode }) => {
+const TodoItem = ({ children, completed, id, editMode }) => {
   const { todos, setTodos, edit, setEdit } = useContext(TodoContext);
-  const url = "http://localhost:3030";
-  const handleCheckboxChange = async (todoId, isCompleted) => {
-    console.log(todoId);
+  const url = "https://www.pre-onboarding-selection-task.shop";
+  const access_token = localStorage.getItem("token");
+  const handleCheckboxChange = async (todoId, todo, isCompleted) => {
+    console.log(isCompleted, typeof isCompleted);
     try {
-      const response = await axios.put(`${url}/todos/done/${todoId}`, { isCompleted });
+      const response = await axios.put(
+        `${url}/todos/${todoId}`,
+        {
+          todo: todo,
+          isCompleted: isCompleted,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       setTodos((prevTodos) => {
         return prevTodos.map((todo) => {
           if (todo.id === todoId) {
-            return { ...todo, isCompleted: response.data.isCompleted };
+            return { ...todo, todo: response.data.todo, isCompleted: response.data.isCompleted };
           }
           return todo;
         });
@@ -116,10 +146,21 @@ const TodoItem = ({ children, completed, id, order, editMode }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (id) => {
+    const access_token = localStorage.getItem("token");
     try {
-      const response = await axios.delete(`${url}/todos/${id}`, { id });
-      console.log(response.data);
+      await axios.delete(`${url}/todos/${id}`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+
+      const response = await axios.get(`${url}/todos`, {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+          "Content-Type": "application/json",
+        },
+      });
       setTodos(response.data);
     } catch (error) {
       console.error(error);
@@ -132,18 +173,27 @@ const TodoItem = ({ children, completed, id, order, editMode }) => {
     setInputValue(e.target.value);
   };
 
-  const handleEdit = (order) => {
-    setEdit(order);
+  const handleEdit = (id) => {
+    setEdit(id);
   };
 
-  const handleEditSubmit = async (id, inputValue) => {
+  const handleEditSubmit = async (id, inputValue, completed) => {
+    const access_token = localStorage.getItem("token");
     try {
-      const response = await axios.put(`${url}/todos/edit/${id}`, { todo: inputValue });
-      console.log(response.data);
+      const response = await axios.put(
+        `${url}/todos/${id}`,
+        { todo: inputValue, isCompleted: completed },
+        {
+          headers: {
+            Authorization: `Bearer ${access_token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
       setTodos((prevTodos) => {
         return prevTodos.map((todo) => {
           if (todo.id === id) {
-            return { ...todo, todo: response.data.todo };
+            return { ...todo, todo: response.data.todo, isCompleted: response.data.isCompleted };
           }
           return todo;
         });
@@ -160,23 +210,23 @@ const TodoItem = ({ children, completed, id, order, editMode }) => {
         {!editMode ? (
           <div style={{ display: "flex", alignContent: "center" }}>
             <label style={{ flex: "1 1 auto", display: "flex", gap: "10px" }}>
-              <input type="checkbox" checked={completed} onChange={(e) => handleCheckboxChange(id, e.target.checked)} />
+              <input type="checkbox" checked={completed} onChange={(e) => handleCheckboxChange(id, children, e.target.checked)} />
               <span>{children}</span>
             </label>
-            <Button size="small" data="modify-button" event={() => handleEdit(order)}>
+            <Button size="small" data="modify-button" event={() => handleEdit(id)}>
               수정
             </Button>
-            <Button size="small" data="delete-button" event={handleDelete}>
+            <Button size="small" data="delete-button" event={() => handleDelete(id)}>
               삭제
             </Button>
           </div>
         ) : (
           <div style={{ display: "flex", alignContent: "center" }}>
             <label style={{ flex: "1 1 auto", display: "flex", gap: "10px" }}>
-              <input type="checkbox" checked={completed} onChange={(e) => handleCheckboxChange(id, e.target.checked)} />
+              <input type="checkbox" checked={completed} onChange={(e) => handleCheckboxChange(id, children, e.target.checked)} />
               <input data-testid="modify-input" defaultValue={children} onChange={handleEditChange} />
             </label>
-            <Button size="small" data="submit-Button" event={() => handleEditSubmit(id, inputValue)}>
+            <Button size="small" data="submit-Button" event={() => handleEditSubmit(id, inputValue, completed)}>
               제출
             </Button>
             <Button size="small" data="cancel-Button" event={() => setEdit(false)}>
